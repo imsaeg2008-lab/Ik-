@@ -1,30 +1,947 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IK</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>
-body{margin:0;background:#000;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;height:100vh}
-.card{background:#111;padding:30px;border-radius:20px;text-align:center;box-shadow:0 0 20px #444;width:320px}
-.logo{width:90px;height:90px;border:3px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;margin:0 auto 15px}
-button{width:100%;padding:12px;margin:8px 0;border:0;border-radius:12px;background:#222;color:#fff;font-size:18px;cursor:pointer}
-button:hover{background:#444}
-.modal{display:none;position:fixed;inset:0;background:#000a;justify-content:center;align-items:center}
-.box{background:#111;padding:20px;border-radius:15px;width:280px}
-.box a{display:block;color:#fff;text-decoration:none;background:#222;padding:10px;border-radius:10px;margin:8px 0}
-</style></head><body>
-<div class="card"><div class="logo">IK</div><h2>WEB DEVELOPER</h2>
-<button onclick="show('wa')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-<button onclick="window.open('https://www.instagram.com/ik.dev.eg?igsh=MWlqMjlybzcxM29xbA==')"><i class="fab fa-instagram"></i> Instagram</button>
-<button onclick="show('call')"><i class="fa fa-phone"></i> Call</button></div>
-<div id="wa" class="modal"><div class="box"><h3>Choose WhatsApp</h3>
-<a href="https://wa.me/201066517988">Number 1</a>
-<a href="https://wa.me/201125093884">Number 2</a>
-<button onclick="hide('wa')">Close</button></div></div>
-<div id="call" class="modal"><div class="box"><h3>Choose Number</h3>
-<a href="tel:+201066517988">Call 1</a>
-<a href="tel:+201125093884">Call 2</a>
-<button onclick="hide('call')">Close</button></div></div>
-<script>
-function show(id){document.getElementById(id).style.display='flex'}
-function hide(id){document.getElementById(id).style.display='none'}
-</script></body></html>
+<html lang="ar" dir="rtl" id="htmlTag">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HIK DEV - Store & Services</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("YOUR_PUBLIC_KEY");
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #080b12;
+            --card-bg: rgba(15, 22, 36, 0.98);
+            --primary-glow: #00d4ff;
+            --secondary-glow: #0066ff;
+            --text-main: #ffffff;
+            --text-dim: #a0aec0;
+            --input-bg: #0d1421;
+            --border-color: rgba(0, 212, 255, 0.25);
+            --accent-green: #25d366;
+            --accent-gold: #ffb700;
+            --accent-red: #ff4d4d;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #1a202c;
+            --text-dim: #4a5568;
+            --input-bg: #f8fafc;
+            --border-color: rgba(0, 102, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            transition: background 0.3s, color 0.3s, transform 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        body.keyboard-active {
+            align-items: flex-start;
+            padding-top: 20px;
+        }
+
+        body.keyboard-active .container {
+            transform: translateY(-10px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        body.keyboard-active .logo-section {
+            transform: scale(0.6);
+            margin-bottom: -20px;
+        }
+
+        .page { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            padding: 24px 20px;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 212, 255, 0.12);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .logo-section { 
+            margin-bottom: 20px; 
+            text-align: center; 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-nav-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #ff8800);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 10px rgba(255, 183, 0, 0.3);
+        }
+        
+        .logo-svg {
+            width: 110px;
+            height: 110px;
+            filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.6));
+        }
+
+        .store-title {
+            font-size: 22px;
+            color: var(--text-main);
+            text-align: center;
+            margin-bottom: 18px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .search-box input {
+            padding-right: 35px;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+        }
+
+        .store-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .category-header {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.15), rgba(0, 102, 255, 0.05));
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            border-radius: 14px;
+            margin-top: 14px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-glow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-card {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .product-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .product-card h4 { font-size: 15px; color: var(--text-main); }
+
+        .price-tag {
+            background: linear-gradient(135deg, var(--accent-gold), #ff8800);
+            color: #000;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .product-features {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .order-btn {
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            color: white;
+            text-decoration: none;
+            padding: 9px 14px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        .admin-controls-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .admin-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .admin-btn.edit-btn { background: rgba(0, 212, 255, 0.15); color: var(--primary-glow); border: 1px solid var(--primary-glow); }
+        .admin-btn.delete-btn { background: rgba(255, 77, 77, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+        .stat-box { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+        .stat-item {
+            background: var(--input-bg);
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .stat-item h3 { font-size: 13px; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; }
+        .stat-item .num { font-size: 26px; font-weight: 800; color: var(--primary-glow); }
+
+        .admin-action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .admin-card-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .admin-card-btn i { font-size: 18px; }
+        .admin-card-btn span { font-size: 11px; font-weight: bold; text-align: center; }
+        .admin-card-btn.edit { border-color: rgba(0, 212, 255, 0.4); color: var(--primary-glow); }
+        .admin-card-btn.reset { border-color: rgba(255, 183, 0, 0.4); color: var(--accent-gold); }
+        .admin-card-btn.clear { border-color: rgba(255, 77, 77, 0.4); color: var(--accent-red); }
+        .admin-card-btn.full-control { 
+            border-color: rgba(37, 211, 102, 0.5); 
+            color: #25d366; 
+            background: rgba(37, 211, 102, 0.08);
+        }
+
+        .page1-control-box {
+            background: var(--input-bg);
+            border: 1px dashed var(--primary-glow);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 18px;
+        }
+
+        .page1-control-box h3 {
+            font-size: 14px;
+            color: var(--primary-glow);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .client-card {
+            background: var(--input-bg); padding: 12px; border-radius: 12px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color);
+        }
+
+        .client-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delete-client-btn {
+            color: var(--accent-red);
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .form-group { margin-bottom: 14px; text-align: right; }
+        label { display: block; margin-bottom: 6px; color: var(--text-dim); font-size: 13px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; color: white; outline: none; font-size: 14px; }
+
+        .submit-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            color: white; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 8px;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.25);
+        }
+
+        .add-product-quick-btn {
+            width: 100%;
+            background: rgba(0, 212, 255, 0.12);
+            border: 1px dashed var(--primary-glow);
+            color: var(--primary-glow);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-glow); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="page active" id="pageLogin">
+        <div class="container">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="toggleTheme()">☀️ أبيض</button>
+                <button class="nav-btn" id="langToggleBtn" onclick="toggleLang()"><i class="fa-solid fa-globe"></i> English</button>
+            </div>
+            <div class="logo-section">
+                <svg class="logo-svg" viewBox="0 0 200 200">
+                    <defs>
+                        <linearGradient id="hikGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00d4ff" />
+                            <stop offset="100%" stop-color="#0066ff" />
+                        </linearGradient>
+                    </defs>
+                    <polygon points="100,15 175,58 175,142 100,185 25,142 25,58" fill="none" stroke="url(#hikGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <text x="100" y="118" id="logoSvgText" font-size="44" font-weight="800" fill="url(#hikGrad)" text-anchor="middle" font-family="'Cairo', sans-serif">HIK</text>
+                </svg>
+                <h1 id="mainHeaderTitle" style="font-size: 22px; color: #fff; margin-top: 5px;">HIK DEV</h1>
+                
+                <div id="p1FeaturesContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label id="lblUser">اسم المستخدم:</label>
+                    <input type="text" id="userInp" placeholder="ادخل اسمك الكامل" required>
+                </div>
+                <div class="form-group">
+                    <label id="lblPhone">رقم الهاتف:</label>
+                    <input type="tel" id="phoneInp" placeholder="010XXXXXXXX" required>
+                    <div id="errorMsg" style="display: none; color: #ff4d4d; font-size: 12px; margin-top: 6px; text-align: right; font-weight: bold; animation: fadeIn 0.3s ease;"></div>
+                </div>
+                <button type="submit" class="submit-btn" id="btnSubmit">دخول للمتجر</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="page" id="pageAdmin">
+        <div class="container">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="goToPage('pageLogin')">خروج <i class="fa-solid fa-sign-out"></i></button>
+                <button class="nav-btn" onclick="goToPage('pageStore')">المتجر <i class="fa-solid fa-store"></i></button>
+            </div>
+            
+            <h2 class="store-title">لوحة تحكم الأدمن 👑</h2>
+            
+            <div class="stat-box">
+                <div class="stat-item">
+                    <h3>👁️ عدد الزوار</h3>
+                    <div class="num" id="vCount">0</div>
+                </div>
+                <div class="stat-item">
+                    <h3>📩 عدد المسجلين</h3>
+                    <div class="num" id="cCount">0</div>
+                </div>
+            </div>
+
+            <div class="admin-action-grid">
+                <button class="admin-card-btn edit" onclick="setCustomVisits()">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>تعديل الزوار</span>
+                </button>
+
+                <button class="admin-card-btn reset" onclick="resetVisits()">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>تصفير العداد</span>
+                </button>
+
+                <button class="admin-card-btn clear" onclick="clearClients()">
+                    <i class="fa-solid fa-user-slash"></i>
+                    <span>مسح المسجلين</span>
+                </button>
+
+                <button class="admin-card-btn full-control" onclick="enableFullAdminMode()">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>تعديل الويب سايت كامل</span>
+                </button>
+            </div>
+
+            <div class="page1-control-box">
+                <h3><i class="fa-solid fa-desktop"></i> تعديل إعدادات الموقع والصفحة الأولى</h3>
+                <div class="form-group">
+                    <label>اسم اللوجو الشعار (داخل SVG):</label>
+                    <input type="text" id="p1LogoTextInp" placeholder="مثال: HIK">
+                </div>
+                <div class="form-group">
+                    <label>العنوان الرئيسي:</label>
+                    <input type="text" id="p1TitleInp" placeholder="مثال: HIK DEV">
+                </div>
+                <div class="form-group">
+                    <label>نص زر الدخول:</label>
+                    <input type="text" id="p1BtnInp" placeholder="مثال: دخول للمتجر">
+                </div>
+                <div class="form-group">
+                    <label>رقم الواتساب لاستقبال الطلبات:</label>
+                    <input type="text" id="adminPhoneInp" placeholder="مثال: 201066517988">
+                </div>
+                <button type="button" class="submit-btn" style="padding: 8px; font-size: 13px;" onclick="savePage1Settings()">💾 حفظ تعديلات الموقع</button>
+
+                <hr style="border: 0.5px dashed var(--border-color); margin: 15px 0;">
+                <h4 style="font-size: 13px; color: var(--primary-glow); margin-bottom: 8px;"><i class="fa-solid fa-plus-circle"></i> إضافة ميزة / عنصر جديد للصفحة الأولى:</h4>
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <input type="text" id="newFeatureInp" placeholder="مثال: ⚡ خصم 20% على طلبك الأول">
+                </div>
+                <button type="button" class="submit-btn" style="padding: 8px; font-size: 13px; background: rgba(0, 212, 255, 0.2); border: 1px solid var(--primary-glow);" onclick="addPage1Feature()">➕ إضافة العنصر</button>
+
+                <div id="adminFeaturesList" style="margin-top: 10px;"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="font-size: 14px; color: var(--text-dim);">📋 المسجلين مؤخراً:</h3>
+                <button onclick="exportClientsToCSV()" style="background: rgba(37, 211, 102, 0.2); color: #25d366; border: 1px solid #25d366; padding: 4px 8px; border-radius: 8px; font-size: 11px; cursor: pointer;">
+                    <i class="fa-solid fa-file-excel"></i> تصدير البيانات
+                </button>
+            </div>
+            <div id="clientsList" style="max-height: 220px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <div class="page" id="pageStore">
+        <div class="container">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="goToPage('pageLogin')"><i class="fa-solid fa-home"></i> الرئيسية</button>
+                <div style="display: flex; gap: 6px;">
+                    <button class="admin-nav-icon" id="adminControlBtn" style="display:none;" onclick="goToPage('pageAdmin')">
+                        <i class="fa-solid fa-crown"></i> الأدمن
+                    </button>
+                    <button class="nav-btn" onclick="toggleTheme()">☀️</button>
+                </div>
+            </div>
+            
+            <h2 class="store-title" id="storeMainTitle">Store / Services - HIK Dev 🛍️</h2>
+
+            <div class="search-box">
+                <input type="text" id="searchInp" placeholder="ابحث عن خدمة..." oninput="renderProducts()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+
+            <button class="add-product-quick-btn" id="quickAddProductBtn" style="display: none;" onclick="quickAddNewProduct()">
+                <i class="fa-solid fa-plus-circle"></i> ➕ إضافة خدمة جديدة هنا
+            </button>
+
+            <div class="store-container" id="productsDynamicContainer">
+            </div>
+        </div>
+    </div>
+    <script>
+        const defaultProducts = [
+            { id: 1, cat: "🌐 Website Development", title: "📄 Landing Page", price: "يبدأ من 1500 ج.م", desc: "صفحة رئيسية | Responsive | ربط واتساب" },
+            { id: 2, cat: "🌐 Website Development", title: "🏢 Business Website", price: "يبدأ من 3000 ج.م", desc: "حتى 5 صفحات | Responsive | حماية أساسية" },
+            { id: 3, cat: "🌐 Website Development", title: "🛒 E-Commerce Website", price: "يبدأ من 7000 ج.م", desc: "متجر إلكتروني | لوحة تحكم | حتى 100 منتج" },
+            { id: 4, cat: "📱 Mobile Applications", title: "Android App", price: "3000 ج.م", desc: "تطبيق أندرويد احترافي" },
+            { id: 5, cat: "📱 Mobile Applications", title: "Android + Windows App", price: "5000 ج.م", desc: "تطبيق يعمل على الأندرويد والكمبيوتر" },
+            { id: 6, cat: "💻 Desktop Applications", title: "Windows App", price: "3000 ج.م", desc: "برنامج مكتب للويندوز" },
+            { id: 7, cat: "🎨 Design Services", title: "Logo Design", price: "700 ج.م", desc: "تصميم شعار احترافي" }
+        ];
+
+        let isAdmin = false;
+
+        if (!localStorage.getItem('h_vis')) localStorage.setItem('h_vis', '1');
+        if (!localStorage.getItem('h_prods')) localStorage.setItem('h_prods', JSON.stringify(defaultProducts));
+
+        function loadPage1Settings() {
+            const settings = JSON.parse(localStorage.getItem('h_p1_settings') || '{}');
+            
+            const logoSvgText = document.getElementById('logoSvgText');
+            const mainHeaderTitle = document.getElementById('mainHeaderTitle');
+            const btnSubmit = document.getElementById('btnSubmit');
+
+            if (settings.logoText && logoSvgText) logoSvgText.textContent = settings.logoText;
+            if (settings.mainTitle && mainHeaderTitle) mainHeaderTitle.textContent = settings.mainTitle;
+            if (settings.btnText && btnSubmit) btnSubmit.textContent = settings.btnText;
+
+            if (document.getElementById('p1LogoTextInp')) {
+                document.getElementById('p1LogoTextInp').value = settings.logoText || 'HIK';
+                document.getElementById('p1TitleInp').value = settings.mainTitle || 'HIK DEV';
+                document.getElementById('p1BtnInp').value = settings.btnText || 'دخول للمتجر';
+                document.getElementById('adminPhoneInp').value = settings.adminPhone || '201066517988';
+            }
+        }
+
+        function savePage1Settings() {
+            const logoText = document.getElementById('p1LogoTextInp').value.trim();
+            const mainTitle = document.getElementById('p1TitleInp').value.trim();
+            const btnText = document.getElementById('p1BtnInp').value.trim();
+            const adminPhone = document.getElementById('adminPhoneInp').value.trim();
+
+            const settings = { logoText, mainTitle, btnText, adminPhone };
+            localStorage.setItem('h_p1_settings', JSON.stringify(settings));
+            
+            loadPage1Settings();
+            alert("تم حفظ تعديلات الموقع بنجاح! 🚀");
+        }
+
+        // إدارة عناصر/مميزات الصفحة الأولى
+        function renderPage1Features() {
+            const features = JSON.parse(localStorage.getItem('h_p1_features') || '[]');
+            const container = document.getElementById('p1FeaturesContainer');
+            const adminList = document.getElementById('adminFeaturesList');
+
+            if (container) {
+                let html = '';
+                features.forEach(f => {
+                    html += `<div style="background: rgba(0, 212, 255, 0.08); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 12px; text-align: center; color: var(--text-main);">${f.text}</div>`;
+                });
+                container.innerHTML = html;
+            }
+
+            if (adminList) {
+                let adminHtml = '';
+                features.forEach(f => {
+                    adminHtml += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background: var(--input-bg); padding: 8px 10px; border-radius: 8px; margin-top: 6px; font-size: 12px; border: 1px solid var(--border-color);">
+                        <span>${f.text}</span>
+                        <i class="fa-solid fa-trash" style="color: var(--accent-red); cursor: pointer;" onclick="deletePage1Feature(${f.id})"></i>
+                    </div>`;
+                });
+                adminList.innerHTML = adminHtml;
+            }
+        }
+
+        function addPage1Feature() {
+            const inp = document.getElementById('newFeatureInp');
+            if (!inp || !inp.value.trim()) return;
+
+            let features = JSON.parse(localStorage.getItem('h_p1_features') || '[]');
+            features.push({ id: Date.now(), text: inp.value.trim() });
+            
+            localStorage.setItem('h_p1_features', JSON.stringify(features));
+            inp.value = '';
+            renderPage1Features();
+        }
+
+        function deletePage1Feature(id) {
+            let features = JSON.parse(localStorage.getItem('h_p1_features') || '[]');
+            features = features.filter(f => f.id !== id);
+            localStorage.setItem('h_p1_features', JSON.stringify(features));
+            renderPage1Features();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPage1Settings();
+            renderPage1Features();
+        });
+
+        const userInp = document.getElementById('userInp');
+        const phoneInp = document.getElementById('phoneInp');
+
+        if (userInp && phoneInp) {
+            [userInp, phoneInp].forEach(input => {
+                if (!input) return;
+                input.addEventListener('focus', (e) => {
+                    document.body.classList.add('keyboard-active');
+                    setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                });
+                input.addEventListener('blur', () => {
+                    document.body.classList.remove('keyboard-active');
+                });
+            });
+        }
+
+        function goToPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById(id);
+            if (targetPage) targetPage.classList.add('active');
+            if (id === 'pageAdmin') {
+                updateAdmin();
+                loadPage1Settings();
+                renderPage1Features();
+            }
+            if (id === 'pageStore') renderProducts();
+        }
+
+        function enableFullAdminMode() {
+            isAdmin = true;
+            goToPage('pageStore');
+            alert("تم تفعيل وضع الأدمن الكامل 👑! يمكنك الآن تعديل وإضافة وحذف أي شيء في المتجر.");
+        }
+
+        function isValidEgyptianPhone(phone) {
+            return /^01[0125][0-9]{8}$/.test(phone);
+        }
+
+        function showError(msg) {
+            const errBox = document.getElementById('errorMsg');
+            if (errBox && phoneInp) {
+                errBox.textContent = msg;
+                errBox.style.display = 'block';
+                phoneInp.style.borderColor = '#ff4d4d';
+            }
+        }
+
+        function hideError() {
+            const errBox = document.getElementById('errorMsg');
+            if (errBox && phoneInp) {
+                errBox.style.display = 'none';
+                errBox.style.borderColor = 'var(--border-color)';
+            }
+        }
+
+        if (phoneInp) phoneInp.oninput = hideError;
+
+        function renderProducts() {
+            const container = document.getElementById('productsDynamicContainer');
+            const quickAddBtn = document.getElementById('quickAddProductBtn');
+            const adminCtrlBtn = document.getElementById('adminControlBtn');
+            const searchVal = document.getElementById('searchInp') ? document.getElementById('searchInp').value.toLowerCase().trim() : '';
+
+            if (!container) return;
+
+            if (quickAddBtn) quickAddBtn.style.display = isAdmin ? 'flex' : 'none';
+            if (adminCtrlBtn) adminCtrlBtn.style.display = isAdmin ? 'flex' : 'none';
+
+            let prods = JSON.parse(localStorage.getItem('h_prods') || '[]');
+            
+            if (searchVal) {
+                prods = prods.filter(p => p.title.toLowerCase().includes(searchVal) || p.desc.toLowerCase().includes(searchVal) || p.cat.toLowerCase().includes(searchVal));
+            }
+
+            let categories = [...new Set(prods.map(p => p.cat))];
+            const settings = JSON.parse(localStorage.getItem('h_p1_settings') || '{}');
+            const targetPhone = settings.adminPhone || '201066517988';
+
+            let html = '';
+            if (prods.length === 0) {
+                html = `<p style="text-align:center; padding: 20px; color: var(--text-dim);">لا توجد نتائج مطابقة لبحثك.</p>`;
+            } else {
+                categories.forEach(cat => {
+                    html += `<div class="category-header">
+                                <span>${cat}</span>
+                             </div>`;
+                    let catProds = prods.filter(p => p.cat === cat);
+                    
+                    catProds.forEach(p => {
+                        html += `
+                        <div class="product-card">
+                            <div class="product-card-head">
+                                <h4>${p.title}</h4>
+                                <span class="price-tag">${p.price}</span>
+                            </div>
+                            <div class="product-features">${p.desc}</div>
+                            <a href="https://wa.me/${targetPhone}?text=${encodeURIComponent('طلب خدمة: ' + p.title + ' (' + p.price + ')')}" target="_blank" class="order-btn">
+                                طلب الخدمة <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+                            ${isAdmin ? `
+                            <div class="admin-controls-bar">
+                                <button class="admin-btn edit-btn" onclick="editProductPrompt(${p.id})">
+                                    <i class="fa-solid fa-pen"></i> ✏️ تعديل
+                                </button>
+                                <button class="admin-btn delete-btn" onclick="deleteProduct(${p.id})">
+                                    <i class="fa-solid fa-trash"></i> 🗑️ حذف
+                                </button>
+                            </div>` : ''}
+                        </div>`;
+                    });
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function quickAddNewProduct() {
+            let cat = prompt("أدخل اسم القسم (مثال: 🌐 Website Development):", "🌐 Website Development");
+            if (!cat) return;
+            let title = prompt("أدخل اسم الخدمة الجديدة:");
+            if (!title) return;
+            let price = prompt("أدخل السعر (مثال: 2000 ج.م):");
+            if (!price) return;
+            let desc = prompt("أدخل تفاصيل ومميزات الخدمة:");
+
+            let prods = JSON.parse(localStorage.getItem('h_prods') || '[]');
+            prods.push({
+                id: Date.now(),
+                cat: cat.trim(),
+                title: title.trim(),
+                price: price.trim(),
+                desc: desc ? desc.trim() : 'خدمة مخصصة'
+            });
+
+            localStorage.setItem('h_prods', JSON.stringify(prods));
+            renderProducts();
+        }
+
+        function editProductPrompt(id) {
+            let prods = JSON.parse(localStorage.getItem('h_prods') || '[]');
+            let prod = prods.find(p => p.id === id);
+            if (!prod) return;
+
+            let newTitle = prompt("تعديل اسم الخدمة:", prod.title);
+            if (newTitle === null) return;
+
+            let newPrice = prompt("تعديل السعر:", prod.price);
+            if (newPrice === null) return;
+
+            let newDesc = prompt("تعديل التفاصيل:", prod.desc);
+            if (newDesc === null) return;
+
+            prod.title = newTitle.trim() || prod.title;
+            prod.price = newPrice.trim() || prod.price;
+            prod.desc = newDesc.trim() || prod.desc;
+
+            localStorage.setItem('h_prods', JSON.stringify(prods));
+            renderProducts();
+        }
+
+        function deleteProduct(id) {
+            if (confirm("هل أنت متأكد من حذف هذه الخدمة من المتجر؟")) {
+                let prods = JSON.parse(localStorage.getItem('h_prods') || '[]');
+                prods = prods.filter(p => p.id !== id);
+                localStorage.setItem('h_prods', JSON.stringify(prods));
+                renderProducts();
+            }
+        }
+
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.onsubmit = function(e) {
+                e.preventDefault();
+
+                const u = userInp.value.trim().toLowerCase();
+                const p = phoneInp.value.trim();
+
+                if (u === 'admin' && (p === '01159001888' || p === '1159001888')) {
+                    isAdmin = true;
+                    goToPage('pageAdmin');
+                    return false;
+                }
+
+                isAdmin = false;
+
+                if (!isValidEgyptianPhone(p)) {
+                    showError("⚠️ عفواً، يرجى إدخال رقم مصري صحيح مكون من 11 رقماً (010, 011, 012, 015)");
+                    phoneInp.focus();
+                    return false;
+                }
+
+                const now = new Date();
+                const englishDateTime = now.toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' });
+
+                let visits = parseInt(localStorage.getItem('h_vis') || '0') + 1;
+                localStorage.setItem('h_vis', visits);
+
+                let list = JSON.parse(localStorage.getItem('h_cli') || '[]');
+                const clientName = userInp.value.trim();
+                list.push({ id: Date.now(), name: clientName, phone: p, time: englishDateTime });
+                localStorage.setItem('h_cli', JSON.stringify(list));
+
+                if (typeof emailjs !== 'undefined') {
+                    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                        client_name: clientName, client_phone: p, login_time: englishDateTime
+                    });
+                }
+
+                goToPage('pageStore');
+                return false;
+            };
+        }
+
+        function updateAdmin() {
+            const vCount = document.getElementById('vCount');
+            const cCount = document.getElementById('cCount');
+            const clientsList = document.getElementById('clientsList');
+
+            if (vCount) vCount.textContent = localStorage.getItem('h_vis') || '0';
+            
+            let list = JSON.parse(localStorage.getItem('h_cli') || '[]');
+            if (cCount) cCount.textContent = list.length;
+
+            if (clientsList) {
+                let html = '';
+                list.slice().reverse().forEach(c => {
+                    html += `
+                    <div class="client-card">
+                        <div>
+                            <strong>${c.name}</strong><br>
+                            <small>${c.phone}</small><br>
+                            <small style="color: var(--primary-glow); font-size: 10px;">🕒 ${c.time || 'N/A'}</small>
+                        </div>
+                        <div class="client-actions">
+                            <a href="https://wa.me/2${c.phone}" target="_blank" style="color:#25d366; font-size:18px;">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+                            <i class="fa-solid fa-trash delete-client-btn" onclick="deleteSingleClient(${c.id})" title="حذف العميل"></i>
+                        </div>
+                    </div>`;
+                });
+                clientsList.innerHTML = html || '<p style="text-align:center; font-size:13px; color:var(--text-dim); margin-top: 10px;">لا يوجد مسجلين بعد</p>';
+            }
+        }
+
+        function deleteSingleClient(id) {
+            if (confirm("هل أنت متأكد من حذف هذا العميل؟")) {
+                let list = JSON.parse(localStorage.getItem('h_cli') || '[]');
+                list = list.filter(c => c.id !== id);
+                localStorage.setItem('h_cli', JSON.stringify(list));
+                updateAdmin();
+            }
+        }
+
+        function exportClientsToCSV() {
+            let list = JSON.parse(localStorage.getItem('h_cli') || '[]');
+            if (list.length === 0) {
+                alert("لا توجد بيانات مسجلة للتصدير!");
+                return;
+            }
+            let csv = "Name,Phone,Time\n";
+            list.forEach(c => {
+                csv += `"${c.name}","${c.phone}","${c.time}"\n`;
+            });
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "clients_list.csv";
+            link.click();
+        }
+
+        function setCustomVisits() {
+            let val = prompt("أدخل عدد الزوار الجديد الذي تريده:", localStorage.getItem('h_vis'));
+            if (val !== null && !isNaN(val) && val.trim() !== '') {
+                localStorage.setItem('h_vis', val.trim());
+                updateAdmin();
+            }
+        }
+
+        function resetVisits() {
+            if (confirm("هل أنت متأكد من تصفير عداد الزوار؟")) {
+                localStorage.setItem('h_vis', '0');
+                updateAdmin();
+            }
+        }
+
+        function clearClients() {
+            if (confirm("هل أنت متأكد من مسح جميع بيانات العملاء المسجلين؟")) {
+                localStorage.setItem('h_cli', '[]');
+                updateAdmin();
+            }
+        }
+
+        let currentLang = 'ar';
+        function toggleLang() {
+            const htmlTag = document.getElementById('htmlTag');
+            const langBtn = document.getElementById('langToggleBtn');
+            const lblUser = document.getElementById('lblUser');
+            const lblPhone = document.getElementById('lblPhone');
+
+            if (currentLang === 'ar') {
+                currentLang = 'en';
+                htmlTag.setAttribute('dir', 'ltr');
+                if (langBtn) langBtn.innerHTML = '<i class="fa-solid fa-globe"></i> عربي';
+                if (lblUser) lblUser.textContent = 'Username:';
+                if (lblPhone) lblPhone.textContent = 'Phone Number:';
+                if (userInp) userInp.placeholder = 'Enter full name';
+            } else {
+                currentLang = 'ar';
+                htmlTag.setAttribute('dir', 'rtl');
+                if (langBtn) langBtn.innerHTML = '<i class="fa-solid fa-globe"></i> English';
+                if (lblUser) lblUser.textContent = 'اسم المستخدم:';
+                if (lblPhone) lblPhone.textContent = 'رقم الهاتف:';
+                if (userInp) userInp.placeholder = 'ادخل اسمك الكامل';
+            }
+        }
+
+        let dark = true;
+        function toggleTheme() {
+            dark = !dark;
+            if (!dark) document.getElementById('htmlTag').setAttribute('data-theme', 'light');
+            else document.getElementById('htmlTag').removeAttribute('data-theme');
+        }
+    </script>
+</body>
+</html>
