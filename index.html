@@ -47,6 +47,11 @@
             transition: background 0.3s, color 0.3s, transform 0.3s ease;
         }
 
+        /* دوران سهم الرجوع في حالة اللغة الإنجليزية */
+        [dir="ltr"] .fa-arrow-right {
+            transform: rotate(180deg);
+        }
+
         body {
             background: var(--bg-color);
             min-height: 100vh;
@@ -412,8 +417,12 @@
     <div class="page" id="pageAdmin">
         <div class="container">
             <div class="top-nav">
-                <button class="nav-btn" onclick="goToPage('pageLogin')">خروج <i class="fa-solid fa-sign-out"></i></button>
-                <button class="nav-btn" onclick="goToPage('pageStore')">المتجر <i class="fa-solid fa-store"></i></button>
+                <button class="nav-btn" onclick="goToPage('pageStore')">
+                    <i class="fa-solid fa-arrow-right"></i> العودة للمتجر
+                </button>
+                <button class="nav-btn" onclick="goToPage('pageLogin')">
+                    خروج <i class="fa-solid fa-sign-out"></i>
+                </button>
             </div>
             
             <h2 class="store-title">لوحة تحكم الأدمن 👑</h2>
@@ -494,7 +503,9 @@
     <div class="page" id="pageStore">
         <div class="container">
             <div class="top-nav">
-                <button class="nav-btn" onclick="goToPage('pageLogin')"><i class="fa-solid fa-home"></i> الرئيسية</button>
+                <button class="nav-btn" onclick="goToPage('pageLogin')">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع
+                </button>
                 <div style="display: flex; gap: 6px;">
                     <button class="admin-nav-icon" id="adminControlBtn" style="display:none;" onclick="goToPage('pageAdmin')">
                         <i class="fa-solid fa-crown"></i> الأدمن
@@ -566,7 +577,6 @@
             alert("تم حفظ تعديلات الموقع بنجاح! 🚀");
         }
 
-        // إدارة عناصر/مميزات الصفحة الأولى
         function renderPage1Features() {
             const features = JSON.parse(localStorage.getItem('h_p1_features') || '[]');
             const container = document.getElementById('p1FeaturesContainer');
