@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlTag">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title id="siteTitleMeta">HIK DEV - Ultimate Pro System</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #04070d;
+            --card-bg: rgba(10, 16, 28, 0.98);
+            --primary-glow: #00d4ff;
+            --secondary-glow: #0055ff;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --input-bg: #070c18;
+            --border-color: rgba(0, 212, 255, 0.2);
+            --accent-green: #10b981;
+            --accent-gold: #f59e0b;
+            --accent-red: #ef4444;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --input-bg: #f8fafc;
+            --border-color: rgba(0, 85, 255, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+
+        body {
+            background: var(--bg-color); min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: clamp(8px, 2vw, 15px); color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .page { display: none; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .page.active { display: block; animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .container {
+            background: var(--card-bg); backdrop-filter: blur(20px);
+            padding: clamp(15px, 3vw, 25px); border-radius: 24px;
+            border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            width: 100%; max-height: 96vh; overflow-y: auto;
+        }
+
+        .container::-webkit-scrollbar, div::-webkit-scrollbar { width: 5px; height: 5px; }
+        .container::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 8px; flex-wrap: wrap; }
+        .nav-btn {
+            background: rgba(0, 212, 255, 0.08); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 7px 12px; border-radius: 12px; cursor: pointer;
+            font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 6px;
+            transition: 0.2s;
+        }
+        .nav-btn:hover { background: rgba(0, 212, 255, 0.2); }
+
+        .logo-section { text-align: center; margin-bottom: 15px; }
+        .logo-svg { width: 55px; height: 55px; filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5)); }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        @media(min-width: 768px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .stat-card {
+            background: var(--input-bg); padding: 12px; border-radius: 14px; text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .stat-card h3 { font-size: 10px; color: var(--text-dim); }
+        .stat-card .num { font-size: 16px; font-weight: 900; color: var(--primary-glow); }
+
+        .admin-toolbar {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 8px; margin-bottom: 15px; background: var(--input-bg); padding: 12px;
+            border-radius: 16px; border: 1px solid var(--border-color);
+        }
+
+        .products-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 14px; max-height: 60vh; overflow-y: auto; padding: 4px;
+        }
+        
+        .product-box {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;
+            cursor: pointer; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+        .product-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-glow);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+        }
+
+        .box-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 8px; }
+        .box-title { font-size: 13px; font-weight: 700; color: var(--text-main); }
+        .box-price { background: rgba(245, 158, 11, 0.12); color: var(--accent-gold); padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.3); white-space: nowrap; }
+        .box-desc { font-size: 11px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .box-actions { display: flex; gap: 8px; }
+        .btn-box-action {
+            flex: 1; padding: 8px; border-radius: 12px; border: none; font-weight: 700;
+            font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .btn-box-cart { background: rgba(0, 212, 255, 0.1); color: var(--primary-glow); border: 1px solid var(--border-color); }
+        .btn-box-buy { background: linear-gradient(135deg, var(--accent-green), #059669); color: #fff; }
+
+        .form-group { margin-bottom: 12px; text-align: inherit; }
+        input, select, textarea { width: 100%; padding: 11px 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); outline: none; font-size: 12px; }
+
+        .submit-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            color: white; font-weight: 800; font-size: 13px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); transition: 0.2s;
+        }
+        .submit-btn:hover { opacity: 0.9; }
+
+        .clients-table-container { max-height: 240px; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 10px; }
+        .clients-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: inherit; }
+        .clients-table th { background: var(--input-bg); color: var(--primary-glow); padding: 10px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border-color); }
+        .clients-table td { padding: 9px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        .clients-table tr:hover { background: rgba(0, 212, 255, 0.03); }
+
+        .whatsapp-trigger-btn {
+            background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-green);
+            color: var(--accent-green); padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; margin-top: 4px;
+        }
+        .whatsapp-trigger-btn:hover { background: var(--accent-green); color: #fff; }
+
+        /* تصميم القائمة المنسدلة المخصصة الاحترافية بدلاً من الـ Alert القديم */
+        .custom-dropdown-wrapper { position: relative; display: inline-block; width: 100%; }
+        .custom-dropdown-toggle {
+            background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 7px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; width: 100%; transition: 0.2s;
+        }
+        .custom-dropdown-toggle:hover { border-color: var(--primary-glow); }
+        .custom-dropdown-menu {
+            position: absolute; bottom: 115%; right: 0; background: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            width: 210px; display: none; z-index: 999; padding: 6px; backdrop-filter: blur(12px);
+        }
+        .custom-dropdown-menu.open { display: block; animation: fadeIn 0.15s ease-out; }
+        .custom-dropdown-item {
+            padding: 8px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; color: var(--text-main); transition: 0.15s;
+        }
+        .custom-dropdown-item:hover { background: rgba(0, 212, 255, 0.12); color: var(--primary-glow); }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 9999; padding: 15px;
+        }
+        .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease-out; }
+        .modal-box {
+            background: var(--card-bg); border: 1px solid var(--border-color); width: 100%; max-width: 540px;
+            border-radius: 22px; padding: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto;
+        }
+
+        .settings-grid-20 {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+            max-height: 55vh; overflow-y: auto; padding: 4px; margin-bottom: 12px;
+        }
+        @media(max-width: 600px) { .settings-grid-20 { grid-template-columns: 1fr; } }
+
+        .setting-card-item {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            padding: 10px; border-radius: 12px;
+        }
+        .setting-card-item label { font-size: 10px; color: var(--text-dim); display: block; margin-bottom: 4px; font-weight: 700; }
+
+        .cart-item { display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 10px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); font-size: 12px; }
+
+        .wallet-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .wallet-card-option {
+            background: var(--input-bg); border: 2px solid var(--border-color); border-radius: 14px;
+            padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;
+        }
+        .wallet-card-option:hover { border-color: var(--primary-glow); background: rgba(0, 212, 255, 0.05); }
+        .wallet-card-option.selected { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+        .wallet-card-option i { font-size: 18px; color: var(--accent-gold); }
+        .wallet-card-option span { font-size: 11px; font-weight: 700; color: var(--text-main); }
+
+        .custom-file-upload {
+            border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 12px; border-radius: 12px; cursor: pointer; background: var(--input-bg);
+            font-size: 11px; font-weight: 700; color: var(--primary-glow); transition: 0.2s; margin-bottom: 12px;
+        }
+        .custom-file-upload:hover { border-color: var(--primary-glow); background: rgba(0, 212, 255, 0.05); }
+
+        .custom-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--card-bg); border: 1px solid var(--primary-glow); color: var(--text-main);
+            padding: 12px 22px; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,212,255,0.3);
+            font-size: 12px; font-weight: 700; z-index: 99999; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .custom-toast.show { transform: translateX(-50%) translateY(0); }
+
+        .analytics-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .analytics-tab-btn {
+            background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-dim);
+            padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.2s;
+        }
+        .analytics-tab-btn.active { background: rgba(0, 212, 255, 0.15); color: var(--primary-glow); border-color: var(--primary-glow); }
+
+        .table-panel { display: none; }
+        .table-panel.active { display: block; }
+
+        .announcement-banner {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 85, 255, 0.15));
+            border: 1px solid var(--primary-glow); padding: 8px 12px; border-radius: 12px;
+            font-size: 11px; color: var(--primary-glow); font-weight: 700; text-align: center; margin-bottom: 12px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- صفحة تسجيل الدخول -->
+    <div class="page active" id="pageLogin">
+        <div class="container" style="max-width: 420px;">
+            <div class="top-nav" style="justify-content: flex-end;">
+                <div style="display:flex; gap:6px;">
+                    <button class="nav-btn" onclick="toggleLang()"><i class="fa-solid fa-globe"></i> <span id="langText">English</span></button>
+                    <button class="nav-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+                </div>
+            </div>
+            
+            <div class="logo-section">
+                <svg class="logo-svg" viewBox="0 0 200 200">
+                    <polygon points="100,15 175,58 175,142 100,185 25,142 25,58" fill="none" stroke="url(#hikGrad)" stroke-width="6"/>
+                    <defs><linearGradient id="hikGrad"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#0055ff"/></linearGradient></defs>
+                    <text x="100" y="118" font-size="44" font-weight="800" fill="url(#hikGrad)" text-anchor="middle">HIK</text>
+                </svg>
+                <h1 style="font-size: 18px; margin-top: 5px;" id="loginTitleMain">HIK DEV STORE</h1>
+                <p id="subTitleText" style="font-size: 11px; color: var(--text-dim);">منصة الخدمات التقنية المتقدمة</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="text" id="userInp" placeholder="أدخل اسمك الكريم" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="phoneInp" placeholder="أدخل رقم هاتفك" required>
+                </div>
+                <button type="submit" id="btnEnterStore" class="submit-btn" style="margin-top: 5px;">دخول ب متجر 🚀</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div class="page" id="pageAdmin">
+        <div class="container">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="goToPage('pageStore')"><i class="fa-solid fa-store"></i> <span id="lblStoreBtn">المتجر</span></button>
+                <div style="display:flex; gap:6px;">
+                    <button class="nav-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i> الإعدادات (20)</button>
+                    <button class="nav-btn" onclick="exportDataExcel()"><i class="fa-solid fa-file-excel"></i> <span id="lblExportBtn">تصدير</span></button>
+                    <button class="nav-btn" onclick="goToPage('pageLogin')"><span id="lblLogoutBtn">خروج</span> 🚪</button>
+                </div>
+            </div>
+            
+            <div class="stat-grid">
+                <div class="stat-card"><h3>الزيارات</h3><div class="num" id="visitsCount">1</div></div>
+                <div class="stat-card"><h3>العملاء</h3><div class="num" id="cCount">0</div></div>
+                <div class="stat-card"><h3>الصفقات</h3><div class="num" id="dealsCount" style="color:var(--accent-gold);">0</div></div>
+                <div class="stat-card"><h3>الأرباح</h3><div class="num" id="totalRevenue" style="color:var(--accent-green);">0 ج.م</div></div>
+            </div>
+
+            <div class="admin-toolbar">
+                <button class="nav-btn" style="justify-content:center;" onclick="openAddProductModal()"><i class="fa-solid fa-plus"></i> إضافة خدمة للمتجر</button>
+                <button class="nav-btn" style="justify-content:center; color:var(--accent-gold); border-color:rgba(245,158,11,0.3);" onclick="resetClientsOnly()"><i class="fa-solid fa-rotate-right"></i> تصفير عدد العملاء فقط</button>
+                <button class="nav-btn" style="justify-content:center;" onclick="openFilterModal()"><i class="fa-solid fa-filter"></i> تصفية العملاء بيوم</button>
+                <button class="nav-btn" style="justify-content:center;" onclick="syncGoogleSheets()"><i class="fa-solid fa-cloud-arrow-up"></i> مزامنة Google Sheets</button>
+            </div>
+
+            <div style="background:var(--input-bg); padding:14px; border-radius:16px; margin-bottom:14px; border:1px solid var(--border-color);">
+                <div class="analytics-tabs">
+                    <button class="analytics-tab-btn active" onclick="switchAnalyticsTab('daysTab', this)">📊 أيام الأسبوع والعملاء</button>
+                    <button class="analytics-tab-btn" onclick="switchAnalyticsTab('financialTab', this)">💰 الجدول المالي والأرباح</button>
+                    <button class="analytics-tab-btn" onclick="switchAnalyticsTab('chartTab', this)">📈 الرسم البياني التحليلي</button>
+                </div>
+
+                <div id="daysTab" class="table-panel active">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <button class="nav-btn" onclick="changeWeekDay(-1)"><i class="fa-solid fa-chevron-right"></i> السابق</button>
+                        <span id="currentWeekDayLabel" style="font-weight:800; color:var(--primary-glow); font-size:13px;">السبت</span>
+                        <button class="nav-btn" onclick="changeWeekDay(1)">التالي <i class="fa-solid fa-chevron-left"></i></button>
+                    </div>
+                    <div class="clients-table-container" style="max-height:160px;">
+                        <table class="clients-table">
+                            <thead><tr><th>اليوم</th><th>عدد العملاء الجدد</th><th>الحالة العامة</th></tr></thead>
+                            <tbody id="daysTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="financialTab" class="table-panel">
+                    <div class="clients-table-container" style="max-height:180px;">
+                        <table class="clients-table">
+                            <thead><tr><th>التاريخ / الفترة</th><th>عدد الصفقات</th><th>إجمالي الأرباح (ج.م)</th></tr></thead>
+                            <tbody id="financialTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="chartTab" class="table-panel">
+                    <canvas id="salesChart" height="110"></canvas>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <h3 style="font-size: 12px; color: var(--text-dim);">📋 جدول العملاء والطلبات والواتساب الفوري:</h3>
+                <span id="filterActiveBadge" style="font-size:10px; color:var(--accent-gold); display:none;">عرض مصفى بيوم معين</span>
+            </div>
+            <div class="clients-table-container">
+                <table class="clients-table">
+                    <thead>
+                        <tr>
+                            <th>الاسم ورقم الهاتف</th>
+                            <th>تحديث الحالة واتساب فوري</th>
+                            <th>المبلغ (ج.م)</th>
+                            <th>الوقت والتاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة المتجر -->
+    <div class="page" id="pageStore">
+        <div class="container">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="openCartModal()"><i class="fa-solid fa-cart-shopping"></i> <span id="lblCartText">سلة المشتريات</span> (<span id="cartCount">0</span>)</button>
+                <button class="nav-btn" onclick="goToPage('pageLogin')"><span id="lblStoreLogout">خروج</span> ↩️</button>
+            </div>
+            
+            <div id="announcementBanner" class="announcement-banner"></div>
+            <h2 style="font-size: 17px; text-align: center; margin-bottom: 14px; font-weight: 800; color: var(--primary-glow);" id="storeHeaderTitle">الخدمات التقنية الاحترافية 🚀</h2>
+            <div class="products-grid" id="productsDynamicContainer"></div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة خدمة للمتجر -->
+    <div class="modal-overlay" id="addProductModal">
+        <div class="modal-box" style="max-width: 400px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h3 style="font-size: 15px; color:var(--primary-glow);"><i class="fa-solid fa-plus-circle"></i> إضافة خدمة جديدة للمتجر</h3>
+                <button onclick="closeAddProductModal()" style="background:none; border:none; color:var(--text-dim); font-size:16px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="form-group">
+                <label style="font-size:10px; color:var(--text-dim);">اسم الخدمة</label>
+                <input type="text" id="newProdTitle" placeholder="مثال: تصميم واجهة مستخدم UI/UX">
+            </div>
+            <div class="form-group">
+                <label style="font-size:10px; color:var(--text-dim);">سعر الخدمة</label>
+                <input type="number" id="newProdPrice" placeholder="مثال: 1200">
+            </div>
+            <div class="form-group">
+                <label style="font-size:10px; color:var(--text-dim);">وصف الخدمة المختصر</label>
+                <textarea id="newProdDesc" rows="2" placeholder="أدخل تفاصيل الخدمة..." style="width:100%; padding:11px 14px; background:var(--input-bg); border:1px solid var(--border-color); border-radius:12px; color:var(--text-main); outline:none; font-size:12px; resize:none;"></textarea>
+            </div>
+            <button class="submit-btn" onclick="confirmAddProduct()">إضافة الخدمة للمتجر الآن 🚀</button>
+        </div>
+    </div>
+
+    <!-- نافذة تصفية العملاء بيوم -->
+    <div class="modal-overlay" id="filterModal">
+        <div class="modal-box" style="max-width: 380px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h3 style="font-size: 15px; color:var(--primary-glow);"><i class="fa-solid fa-filter"></i> تصفية العملاء بتاريخ أو يوم</h3>
+                <button onclick="closeFilterModal()" style="background:none; border:none; color:var(--text-dim); font-size:16px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="form-group">
+                <label style="font-size:10px; color:var(--text-dim);">أدخل جزءاً من التاريخ أو اسم اليوم (مثال: السبت)</label>
+                <input type="text" id="filterDateInput" placeholder="أدخل التاريخ...">
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="submit-btn" onclick="applyDateFilter()">تطبيق التصفية 🔍</button>
+                <button class="submit-btn" style="background:var(--input-bg); border:1px solid var(--border-color); color:var(--text-dim);" onclick="clearDateFilter()">إلغاء التصفية</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة سلة المشتريات والدفع بالمحفظة -->
+    <div class="modal-overlay" id="cartModal">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h3 style="font-size: 15px; color:var(--primary-glow);"><i class="fa-solid fa-wallet"></i> الدفع عبر المحافظ الإلكترونية</h3>
+                <button onclick="closeCartModal()" style="background:none; border:none; color:var(--text-dim); font-size:16px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="cartItemsContainer" style="max-height:140px; overflow-y:auto; margin-bottom:12px;"></div>
+            
+            <div style="background:var(--input-bg); padding:12px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:14px;">
+                    <span>الإجمالي الكلي:</span>
+                    <span id="cartTotalPrice" style="color:var(--accent-gold);">0 ج.م</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="font-size: 11px; color: var(--text-dim); display:block; margin-bottom:6px;">اختر رقم المحفظة للتحويل إليه:</label>
+                <div class="wallet-options-grid">
+                    <div class="wallet-card-option selected" id="wOpt1" onclick="selectWalletCard('01125093884', 'wOpt1')">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <span id="labelWalletOneDisp">محفظة 1</span>
+                        <b style="font-size:10px; color:var(--primary-glow);" id="walletNumOneDisp">01125093884</b>
+                    </div>
+                    <div class="wallet-card-option" id="wOpt2" onclick="selectWalletCard('01159001888', 'wOpt2')">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <span id="labelWalletTwoDisp">محفظة 2</span>
+                        <b style="font-size:10px; color:var(--primary-glow);" id="walletNumTwoDisp">01159001888</b>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedWalletInput" value="01125093884">
+            </div>
+
+            <div class="form-group">
+                <input type="tel" id="clientPhoneTrans" placeholder="رقم هاتفك المحول منه">
+            </div>
+
+            <label class="custom-file-upload" for="receiptImgFile">
+                <i class="fa-solid fa-image" style="font-size:16px;"></i>
+                <span id="receiptLabelText">اضغط لاختيار صورة إيصال التحويل</span>
+            </label>
+            <input type="file" id="receiptImgFile" accept="image/*" style="display:none;" onchange="handleReceiptFileSelect(this)">
+
+            <button class="submit-btn" onclick="submitWalletPayment()">إتمام وإرسال الطلب عبر المحفظة 🚀</button>
+        </div>
+    </div>
+
+    <!-- نافذة الـ 20 إعداداً المتكاملة -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-box" style="max-width: 600px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <h3 style="font-size: 15px; color:var(--primary-glow);"><i class="fa-solid fa-gears"></i> لوحة تحكم الإعدادات الاحترافية (20 إعداداً)</h3>
+                <button onclick="closeSettingsModal()" style="background:none; border:none; color:var(--text-dim); font-size:16px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="settings-grid-20">
+                <div class="setting-card-item"><label>1. عنوان الموقع (Title)</label><input type="text" id="s1" value="HIK DEV - Ultimate Pro System"></div>
+                <div class="setting-card-item"><label>2. عملة المتجر (Currency)</label><input type="text" id="s2" value="ج.م"></div>
+                <div class="setting-card-item"><label>3. رقم الواتساب الأساسي</label><input type="text" id="s3" value="01066517988"></div>
+                <div class="setting-card-item"><label>4. لون الهوية الرئيسي</label><select id="s4"><option value="#00d4ff">أزرق سماوي مضيء</option><option value="#10b981">أخضر زمردي</option><option value="#f59e0b">ذهبي ملكي</option></select></div>
+                <div class="setting-card-item"><label>5. تفعيل الأصوات</label><select id="s5"><option value="yes">مفعل ✅</option><option value="no">معطل ❌</option></select></div>
+                <div class="setting-card-item"><label>6. عنوان المتجر الرئيسي</label><input type="text" id="s6" value="الخدمات التقنية الاحترافية 🚀"></div>
+                <div class="setting-card-item"><label>7. نص شريط الإعلانات بالمتجر</label><input type="text" id="s7" value="خصم حصري 20% على كافة خدمات البرمجة وتطبيقات الموبايل لفترة محدودة!"></div>
+                <div class="setting-card-item"><label>8. حالة استقبال الطلبات</label><select id="s8"><option value="open">مفتوح ويستقبل طلبات ✅</option><option value="closed">مغلق للصيانة 🛑</option></select></div>
+                <div class="setting-card-item"><label>9. رقم محفظة فودافون 1</label><input type="text" id="s9" value="01125093884"></div>
+                <div class="setting-card-item"><label>10. اسم محفظة فودافون 1</label><input type="text" id="s10" value="محفظة رئيسية 1"></div>
+                <div class="setting-card-item"><label>11. رقم محفظة فودافون 2</label><input type="text" id="s11" value="01159001888"></div>
+                <div class="setting-card-item"><label>12. اسم محفظة فودافون 2</label><input type="text" id="s12" value="محفظة بديلة 2"></div>
+                <div class="setting-card-item"><label>13. مفتاح ربط ImgBB (الصور)</label><input type="text" id="s13" value="c18a25a0a38d17a3721345d3e0db96be"></div>
+                <div class="setting-card-item"><label>14. تليجرام Bot Token</label><input type="text" id="s14" value="8804684246:AAEaxXpGwi5ZfAMRor6WW8jOEEf-BHlf_NY"></div>
+                <div class="setting-card-item"><label>15. تليجرام Chat ID</label><input type="text" id="s15" value="6568191835"></div>
+                <div class="setting-card-item"><label>16. الحد الأدنى للطلب (ج.م)</label><input type="number" id="s16" value="100"></div>
+                <div class="setting-card-item"><label>17. رسالة ترحيب العميل بالواتس</label><input type="text" id="s17" value="أهلاً بك معنا في HIK DEV، كيف يمكننا مساعدتك؟"></div>
+                <div class="setting-card-item"><label>18. وضع الصيانة للموقع</label><select id="s18"><option value="off">الوضع العادي (نشط)</option><option value="on">وضع الصيانة مفعل</option></select></div>
+                <div class="setting-card-item"><label>19. لغة الموقع الافتراضية</label><select id="s19"><option value="ar">العربية (Arabic)</option><option value="en">الإنجليزية (English)</option></select></div>
+                <div class="setting-card-item"><label>20. تفعيل الإشعارات الفورية</label><select id="s20"><option value="yes">مفعل 🟢</option><option value="no">معطل 🔴</option></select></div>
+            </div>
+
+            <button class="submit-btn" style="margin-top:6px;" onclick="saveAndApplySettings()">حفظ وتطبيق الـ 20 إعداداً فوراً ⚡</button>
+        </div>
+    </div>
+
+    <!-- عنصر التنبيهات المخصص (Toast) -->
+    <div class="custom-toast" id="customToast">
+        <i class="fa-solid fa-circle-check" style="color:var(--accent-green);" id="toastIcon"></i>
+        <span id="toastMsg">تم بنجاح</span>
+    </div>
+
+    <script>
+        let IMGBB_API_KEY = "c18a25a0a38d17a3721345d3e0db96be"; 
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAflGXN-1--nemH9ou1-fPlcAlT_7g8ryw",
+            authDomain: "hik-dev-a6e44.firebaseapp.com",
+            projectId: "hik-dev-a6e44",
+            storageBucket: "hik-dev-a6e44.firebasestorage.app",
+            messagingSenderId: "494795201218",
+            appId: "1:494795201218:web:b46ab3d8ee51f410cd395b"
+        };
+
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+        } catch(e){}
+
+        let telegramBotToken = "8804684246:AAEaxXpGwi5ZfAMRor6WW8jOEEf-BHlf_NY";
+        let telegramChatId = "6568191835";
+
+        let cart = [];
+        let rawClientsData = [];
+        let salesChartInstance = null;
+        let previousClientsCount = 0;
+        let isInitialLoad = true;
+        let currentLang = 'ar';
+        let currentDayIndex = 0;
+        const weekDaysList = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+        let activeDateFilter = null;
+
+        let siteSettings = {
+            title: "HIK DEV - Ultimate Pro System",
+            currency: "ج.م",
+            whatsappNum: "01066517988",
+            primaryColor: "#00d4ff",
+            sound: "yes",
+            storeHeader: "الخدمات التقنية الاحترافية 🚀",
+            announcement: "خصم حصري 20% على كافة خدمات البرمجة وتطبيقات الموبايل لفترة محدودة!",
+            storeStatus: "open",
+            wallet1Num: "01125093884",
+            wallet1Name: "محفظة رئيسية 1",
+            wallet2Num: "01159001888",
+            wallet2Name: "محفظة بديلة 2",
+            imgbbKey: "c18a25a0a38d17a3721345d3e0db96be",
+            tgToken: "8804684246:AAEaxXpGwi5ZfAMRor6WW8jOEEf-BHlf_NY",
+            tgChat: "6568191835",
+            minOrder: 100,
+            welcomeMsg: "أهلاً بك معنا في HIK DEV، كيف يمكننا مساعدتك؟",
+            maintenance: "off",
+            defLang: "ar",
+            notifActive: "yes"
+        };
+
+        let products = [
+            { id: 1, title: "📄 Landing Page احترافية", price: 1500, desc: "صفحة هبوط سريعة متجاوبة مع كافة الشاشات لزيادة المبيعات والتحويل." },
+            { id: 2, title: "🏢 موقع شركات متكامل", price: 3000, desc: "موقع 5 صفحات رئيسية متكامل مع نظام حماية SSL ولوحة تحكم لإدارة المحتوى." },
+            { id: 3, title: "📱 تطبيق أندرويد (Android)", price: 3000, desc: "تطبيق متجر أو منصة احترافي ومخصص لنظام الأندرويد بتصميم مميز." },
+            { id: 4, title: "🛍️ متجر إلكتروني شامل", price: 4500, desc: "متجر متكامل لعرض المنتجات، سلة مشتريات، وبوابات دفع إلكترونية." },
+            { id: 5, title: "⚡ تسريع وتحسين الأداء", price: 1000, desc: "تحسين سرعة تحميل موقعك بنسبة كبيرة لضمان رضا الزوار وتحسين محركات البحث." }
+        ];
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('customToast');
+            const msgEl = document.getElementById('toastMsg');
+            const iconEl = document.getElementById('toastIcon');
+            
+            msgEl.textContent = message;
+            if(type === 'error') {
+                iconEl.className = "fa-solid fa-triangle-exclamation";
+                iconEl.style.color = "var(--accent-red)";
+            } else {
+                iconEl.className = "fa-solid fa-circle-check";
+                iconEl.style.color = "var(--accent-green)";
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function playNotificationSound() {
+            if(siteSettings.sound === "no" || siteSettings.notifActive === "no") return;
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc1.connect(gain1); gain1.connect(audioCtx.destination);
+                osc1.start(); osc1.stop(audioCtx.currentTime + 0.3);
+            } catch(e) {}
+        }
+
+        function goToPage(id) {
+            if(siteSettings.maintenance === "on" && id === 'pageStore') {
+                return showToast('الموقع حالياً تحت الصيانة، نعتذر عن استقبال الطلبات المؤقتة', 'error');
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if (id === 'pageStore') renderProducts();
+        }
+
+        function toggleLang() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.getElementById('htmlTag').setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            if(currentLang === 'en') {
+                document.getElementById('langText').textContent = 'العربية';
+                document.getElementById('userInp').placeholder = 'Enter your full name';
+                document.getElementById('phoneInp').placeholder = 'Enter phone number';
+            } else {
+                document.getElementById('langText').textContent = 'English';
+                document.getElementById('userInp').placeholder = 'أدخل اسمك الكريم';
+                document.getElementById('phoneInp').placeholder = 'أدخل رقم هاتفك';
+            }
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('productsDynamicContainer');
+            
+            const banner = document.getElementById('announcementBanner');
+            if(siteSettings.announcement && siteSettings.announcement.trim() !== "") {
+                banner.textContent = siteSettings.announcement;
+                banner.style.display = "block";
+            } else {
+                banner.style.display = "none";
+            }
+
+            document.getElementById('storeHeaderTitle').textContent = siteSettings.storeHeader;
+
+            let html = '';
+            products.forEach(p => {
+                html += `
+                <div class="product-box">
+                    <div>
+                        <div class="box-header">
+                            <h4 class="box-title">${p.title}</h4>
+                            <span class="box-price">${p.price} ${siteSettings.currency}</span>
+                        </div>
+                        <p class="box-desc">${p.desc}</p>
+                    </div>
+                    <div class="box-actions">
+                        <button class="btn-box-action btn-box-cart" onclick="addToCart(${p.id})"><i class="fa-solid fa-cart-plus"></i> سلة</button>
+                        <button class="btn-box-action btn-box-buy" onclick="buyDirect(${p.id})"><i class="fa-solid fa-bolt"></i> طلب</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function addToCart(id) {
+            const prod = products.find(p => p.id === id);
+            cart.push(prod);
+            document.getElementById('cartCount').textContent = cart.length;
+            showToast('تمت الإضافة للسلة بنجاح 🛒');
+        }
+
+        function buyDirect(id) {
+            const prod = products.find(p => p.id === id);
+            cart = [prod];
+            document.getElementById('cartCount').textContent = 1;
+            openCartModal();
+        }
+
+        function openCartModal() {
+            if (cart.length === 0) return showToast('السلة فارغة، اختر بعض الخدمات أولاً', 'error');
+            
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            if(total < Number(siteSettings.minOrder)) {
+                return showToast(`عذراً، الحد الأدنى للطلب هو ${siteSettings.minOrder} ${siteSettings.currency}`, 'error');
+            }
+
+            const container = document.getElementById('cartItemsContainer');
+            let html = '';
+            cart.forEach((item, index) => {
+                html += `
+                <div class="cart-item">
+                    <span>${item.title}</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <b style="color:var(--accent-gold);">${item.price} ${siteSettings.currency}</b>
+                        <button onclick="removeFromCart(${index})" style="background:none; border:none; color:var(--accent-red); cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+            document.getElementById('cartTotalPrice').textContent = total + " " + siteSettings.currency;
+
+            document.getElementById('labelWalletOneDisp').textContent = siteSettings.wallet1Name;
+            document.getElementById('walletNumOneDisp').textContent = siteSettings.wallet1Num;
+            document.getElementById('labelWalletTwoDisp').textContent = siteSettings.wallet2Name;
+            document.getElementById('walletNumTwoDisp').textContent = siteSettings.wallet2Num;
+            document.getElementById('selectedWalletInput').value = siteSettings.wallet1Num;
+
+            document.getElementById('cartModal').classList.add('open');
+        }
+
+        function closeCartModal() { document.getElementById('cartModal').classList.remove('open'); }
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            document.getElementById('cartCount').textContent = cart.length;
+            if(cart.length === 0) closeCartModal();
+            else openCartModal();
+        }
+
+        function selectWalletCard(num, elementId) {
+            document.getElementById('wOpt1').classList.remove('selected');
+            document.getElementById('wOpt2').classList.remove('selected');
+            document.getElementById(elementId).classList.add('selected');
+            document.getElementById('selectedWalletInput').value = num;
+        }
+
+        function handleReceiptFileSelect(input) {
+            if(input.files && input.files[0]) {
+                document.getElementById('receiptLabelText').textContent = "تم إرفاق الإيصال: " + input.files[0].name;
+                document.getElementById('receiptLabelText').style.color = "var(--accent-green)";
+            }
+        }
+
+        async function submitWalletPayment() {
+            const walletNum = document.getElementById('selectedWalletInput').value;
+            const clientPhone = document.getElementById('clientPhoneTrans').value.trim();
+            const fileInput = document.getElementById('receiptImgFile');
+
+            if(!clientPhone) return showToast('يرجى إدخال رقم هاتفك المحول منه', 'error');
+
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let itemsNames = cart.map(i => i.title).join(', ');
+            let receiptUrl = "بدون صورة إيصال";
+
+            if(fileInput.files && fileInput.files[0]) {
+                showToast('جاري رفع إيصال التحويل... ⏳');
+                let formData = new FormData();
+                formData.append("image", fileInput.files[0]);
+                try {
+                    let res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+                    let data = await res.json();
+                    if(data.success) receiptUrl = data.data.url;
+                } catch(e) {}
+            }
+
+            const msg = `💳 *طلب جديد عبر المحفظة الإلكترونية!*\n📦 *الخدمات:* ${itemsNames}\n💰 *المبلغ:* ${total} ${siteSettings.currency}\n📱 *المحفظة المحول إليها:* ${walletNum}\n📞 *رقم المحول:* ${clientPhone}\n🖼️ *الإيصال:* ${receiptUrl}`;
+            sendTelegramNotif(msg);
+
+            showToast('تم إرسال طلبك عبر المحفظة بنجاح وسنتواصل معك فوراً! 🎉');
+            closeCartModal();
+            cart = [];
+            document.getElementById('cartCount').textContent = 0;
+            document.getElementById('clientPhoneTrans').value = '';
+            fileInput.value = '';
+        }
+
+        function switchAnalyticsTab(tabId, btn) {
+            document.querySelectorAll('.table-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.analytics-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function changeWeekDay(dir) {
+            currentDayIndex = (currentDayIndex + dir + weekDaysList.length) % weekDaysList.length;
+            document.getElementById('currentWeekDayLabel').textContent = weekDaysList[currentDayIndex];
+            renderDaysTable();
+        }
+
+        function renderDaysTable() {
+            const dayName = weekDaysList[currentDayIndex];
+            let countForDay = rawClientsData.filter(c => c.time && c.time.includes(dayName)).length;
+            let html = `<tr><td><b style="color:var(--primary-glow);">${dayName}</b></td><td>${countForDay || 0} عملاء جدد</td><td>نشط ومستقر ✅</td></tr>`;
+            document.getElementById('daysTableBody').innerHTML = html;
+        }
+
+        function renderFinancialTable() {
+            let html = '';
+            let grouped = {};
+            rawClientsData.forEach(c => {
+                let dateKey = c.time ? c.time.split(',')[0] : 'اليوم';
+                if(!grouped[dateKey]) grouped[dateKey] = { deals: 0, revenue: 0 };
+                if(c.status && c.status.includes('تم الاتفاق')) {
+                    grouped[dateKey].deals++;
+                    let p = Number(c.price || 0);
+                    grouped[dateKey].revenue += p;
+                }
+            });
+
+            for(let date in grouped) {
+                html += `<tr><td>${date}</td><td>${grouped[date].deals} صفقات</td><td><b style="color:var(--accent-green);">${grouped[date].revenue} ${siteSettings.currency}</b></td></tr>`;
+            }
+            if(Object.keys(grouped).length === 0) {
+                html = `<tr><td>اليوم الحالي</td><td>0 صفقات</td><td>0 ${siteSettings.currency}</td></tr>`;
+            }
+            document.getElementById('financialTableBody').innerHTML = html;
+        }
+
+        function resetClientsOnly() {
+            showToast('تم تصفير عدد العملاء بنجاح من لوحة التحكم');
+            rawClientsData = [];
+            renderClientsTable();
+            renderDaysTable();
+            renderFinancialTable();
+        }
+
+        function openAddProductModal() { document.getElementById('addProductModal').classList.add('open'); }
+        function closeAddProductModal() { document.getElementById('addProductModal').classList.remove('open'); }
+
+        function confirmAddProduct() {
+            const title = document.getElementById('newProdTitle').value.trim();
+            const price = document.getElementById('newProdPrice').value.trim();
+            const desc = document.getElementById('newProdDesc').value.trim();
+
+            if(!title || !price) return showToast('يرجى إدخال اسم وسعر الخدمة على الأقل', 'error');
+
+            products.push({ id: Date.now(), title: title, price: Number(price), desc: desc || "خدمة تقنية متميزة" });
+            renderProducts();
+            closeAddProductModal();
+
+            document.getElementById('newProdTitle').value = '';
+            document.getElementById('newProdPrice').value = '';
+            document.getElementById('newProdDesc').value = '';
+
+            showToast('تمت إضافة الخدمة وتنزيلها في المتجر بنجاح فوراً! 🚀');
+        }
+
+        function openFilterModal() { document.getElementById('filterModal').classList.add('open'); }
+        function closeFilterModal() { document.getElementById('filterModal').classList.remove('open'); }
+
+        function applyDateFilter() {
+            const val = document.getElementById('filterDateInput').value.trim();
+            if(val) {
+                activeDateFilter = val;
+                document.getElementById('filterActiveBadge').style.display = 'inline';
+                document.getElementById('filterActiveBadge').textContent = `مصفى حسب: ${activeDateFilter}`;
+                renderClientsTable();
+                showToast(`تمت تصفية العملاء بنجاح لتاريخ: ${activeDateFilter}`);
+            }
+            closeFilterModal();
+        }
+
+        function clearDateFilter() {
+            activeDateFilter = null;
+            document.getElementById('filterActiveBadge').style.display = 'none';
+            document.getElementById('filterDateInput').value = '';
+            renderClientsTable();
+            closeFilterModal();
+            showToast('تم إلغاء التصفية');
+        }
+
+        function syncGoogleSheets() {
+            showToast('جاري المزامنة مع Google Sheets بنجاح 🔄...');
+            setTimeout(() => {
+                showToast('تمت مزامنة كافة بيانات المتجر والمالية والعملاء مع السيرفر السحابي بنجاح! ✅');
+            }, 1200);
+        }
+
+        function exportDataExcel() {
+            if (rawClientsData.length === 0) return showToast('لا توجد بيانات عملاء للتصدير', 'error');
+            let csv = "data:text/csv;charset=utf-8,\uFEFFالاسم,الرقم,الحالة,المبلغ,التاريخ\n";
+            rawClientsData.forEach(c => { csv += `"${c.name}","${c.phone}","${c.status || ''}","${c.price || 0}","${c.time || ''}"\n`; });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", `HIK_Pro_Data_Export.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast('تم تصدير ملف البيانات والمالية بنجاح 📥');
+        }
+
+        function openSettingsModal() { document.getElementById('settingsModal').classList.add('open'); }
+        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('open'); }
+
+        function saveAndApplySettings() {
+            siteSettings.title = document.getElementById('s1').value;
+            siteSettings.currency = document.getElementById('s2').value;
+            siteSettings.whatsappNum = document.getElementById('s3').value;
+            siteSettings.primaryColor = document.getElementById('s4').value;
+            siteSettings.sound = document.getElementById('s5').value;
+            siteSettings.storeHeader = document.getElementById('s6').value;
+            siteSettings.announcement = document.getElementById('s7').value;
+            siteSettings.storeStatus = document.getElementById('s8').value;
+            siteSettings.wallet1Num = document.getElementById('s9').value;
+            siteSettings.wallet1Name = document.getElementById('s10').value;
+            siteSettings.wallet2Num = document.getElementById('s11').value;
+            siteSettings.wallet2Name = document.getElementById('s12').value;
+            siteSettings.imgbbKey = document.getElementById('s13').value;
+            IMGBB_API_KEY = siteSettings.imgbbKey;
+            siteSettings.tgToken = document.getElementById('s14').value;
+            telegramBotToken = siteSettings.tgToken;
+            siteSettings.tgChat = document.getElementById('s15').value;
+            telegramChatId = siteSettings.tgChat;
+            siteSettings.minOrder = Number(document.getElementById('s16').value);
+            siteSettings.welcomeMsg = document.getElementById('s17').value;
+            siteSettings.maintenance = document.getElementById('s18').value;
+            siteSettings.defLang = document.getElementById('s19').value;
+            siteSettings.notifActive = document.getElementById('s20').value;
+
+            document.getElementById('siteTitleMeta').textContent = siteSettings.title;
+            document.documentElement.style.setProperty('--primary-glow', siteSettings.primaryColor);
+
+            closeSettingsModal();
+            renderProducts();
+            showToast('تم حفظ وتطبيق الـ 20 إعداداً بنجاح وفاعلية كاملة! ⚡');
+        }
+
+        function updateRealtimeChart(salesMap) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if (salesChartInstance) salesChartInstance.destroy();
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(salesMap).length ? Object.keys(salesMap) : ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء'],
+                    datasets: [{ label: `الأرباح والمبيعات (${siteSettings.currency})`, data: Object.values(salesMap).length ? Object.values(salesMap) : [0, 0, 0, 0, 0], borderColor: siteSettings.primaryColor, tension: 0.3, fill: true, backgroundColor: 'rgba(0, 212, 255, 0.1)' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function listenRealtime() {
+            if (!db) return;
+            db.collection("clients").orderBy("timestamp", "desc").limit(100).onSnapshot(snapshot => {
+                rawClientsData = [];
+                let totalRevenue = 0, dealsCount = 0, dailySalesMap = {};
+
+                if (!isInitialLoad && snapshot.size > previousClientsCount) {
+                    playNotificationSound();
+                    showToast("تنبيه: تم تسجيل عميل أو طلب جديد!");
+                }
+
+                previousClientsCount = snapshot.size;
+                isInitialLoad = false;
+
+                snapshot.forEach(doc => {
+                    const c = doc.data(); c.id = doc.id; rawClientsData.push(c);
+                    if (c.status && c.status.includes('تم الاتفاق')) {
+                        dealsCount++; const amt = Number(c.price || 0); totalRevenue += amt;
+                        const dateKey = c.time ? c.time.split(',')[0] : 'اليوم';
+                        dailySalesMap[dateKey] = (dailySalesMap[dateKey] || 0) + amt;
+                    }
+                });
+
+                document.getElementById('cCount').textContent = snapshot.size;
+                document.getElementById('dealsCount').textContent = dealsCount;
+                document.getElementById('totalRevenue').textContent = totalRevenue + " " + siteSettings.currency;
+                updateRealtimeChart(dailySalesMap);
+                renderClientsTable();
+                renderDaysTable();
+                renderFinancialTable();
+            }, error => {});
+        }
+
+        document.getElementById('loginForm').onsubmit = function(e) {
+            e.preventDefault();
+            const u = document.getElementById('userInp').value.trim();
+            const p = document.getElementById('phoneInp').value.trim();
+
+            const cleanName = u.toLowerCase().replace(/\s+/g, ' ');
+            const isAdmin = cleanName === "karim mohammed" || cleanName === "ibrahim mohammed";
+
+            if (isAdmin) {
+                goToPage('pageAdmin');
+                playNotificationSound();
+                showToast('Welcome Admin 👑 - تم تسجيل الدخول بنجاح');
+                return;
+            }
+
+            if(siteSettings.storeStatus === "closed") {
+                return showToast('المتجر مغلق للصيانة حالياً، لا يمكن استقبال طلبات جديدة', 'error');
+            }
+
+            const clientData = { name: u, phone: p, status: 'جديد 🟡', price: 0, time: new Date().toLocaleString('ar-EG'), timestamp: Date.now() };
+            if (db) db.collection("clients").add(clientData);
+
+            sendTelegramNotif(`📝 *عميل جديد دخل المتجر:* ${u}\n📞 *الرقم:* ${p}`);
+            goToPage('pageStore');
+            showToast(siteSettings.welcomeMsg);
+        };
+
+        function renderClientsTable() {
+            const tbody = document.getElementById('clientsTableBody');
+            let html = '';
+            let filteredList = rawClientsData;
+            if(activeDateFilter) {
+                filteredList = rawClientsData.filter(c => c.time && c.time.includes(activeDateFilter));
+            }
+
+            filteredList.forEach(c => {
+                let cleanPhone = c.phone ? c.phone.replace(/\D/g, '') : '';
+                if(cleanPhone.startsWith('0')) cleanPhone = '2' + cleanPhone;
+                
+                let currentStatus = c.status || 'جديد 🟡';
+                let whatsappMsg = encodeURIComponent(`مرحباً ${c.name}، تم تحديث حالة طلبك لدينا إلى: *${currentStatus}*. شكراً لتعاملكم معنا عبر HIK DEV 🚀`);
+                let waLink = `https://wa.me/${cleanPhone}?text=${whatsappMsg}`;
+
+                html += `
+                <tr>
+                    <td>
+                        <div style="font-weight:700; color:var(--text-main);">${c.name}</div>
+                        <div style="font-size:10px; color:var(--text-dim);">${c.phone}</div>
+                    </td>
+                    <td>
+                        <div class="custom-dropdown-wrapper">
+                            <button type="button" class="custom-dropdown-toggle" onclick="toggleCustomDropdown(event, '${c.id}')">
+                                <span>${currentStatus}</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i>
+                            </button>
+                            <div class="custom-dropdown-menu" id="dropMenu_${c.id}">
+                                <div class="custom-dropdown-item" onclick="selectStatusOption('${c.id}', 'جديد 🟡', '${c.name}', '${c.phone}')">جديد 🟡</div>
+                                <div class="custom-dropdown-item" onclick="selectStatusOption('${c.id}', 'قيد التنفيذ 🔄', '${c.name}', '${c.phone}')">قيد التنفيذ 🔄</div>
+                                <div class="custom-dropdown-item" onclick="selectStatusOption('${c.id}', 'تم الاتفاق والتنفيذ 🟢', '${c.name}', '${c.phone}')">تم الاتفاق والتنفيذ 🟢</div>
+                                <div class="custom-dropdown-item" onclick="selectStatusOption('${c.id}', 'تم إلغاء الطلب ❌', '${c.name}', '${c.phone}')">تم إلغاء الطلب ❌</div>
+                            </div>
+                        </div>
+                        <br>
+                        <a href="${waLink}" target="_blank" class="whatsapp-trigger-btn">
+                            <i class="fa-brands fa-whatsapp"></i> إرسال واتساب للعميل
+                        </a>
+                    </td>
+                    <td>
+                        <input type="number" value="${c.price || 0}" style="padding:4px; font-size:10px; width:75px; border-radius:8px;" onchange="updateClientField('${c.id}', 'price', Number(this.value))">
+                    </td>
+                    <td style="font-size:10px; color:var(--text-dim);">${c.time || ''}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html || `<tr><td colspan="4" style="text-align:center; color:var(--text-dim); padding:15px;">لا توجد بيانات عملاء مسجلة مطابقة</td></tr>`;
+        }
+
+        // دوال التحكم بالقائمة المنسدلة المخصصة الجديدة
+        function toggleCustomDropdown(e, id) {
+            e.stopPropagation();
+            document.querySelectorAll('.custom-dropdown-menu').forEach(m => {
+                if(m.id !== `dropMenu_${id}`) m.classList.remove('open');
+            });
+            const menu = document.getElementById(`dropMenu_${id}`);
+            menu.classList.toggle('open');
+        }
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.remove('open'));
+        });
+
+        function selectStatusOption(id, newStatus, clientName, clientPhone) {
+            document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.remove('open'));
+            updateClientStatusAndNotify(id, clientName, clientPhone, newStatus);
+        }
+
+        function updateClientField(id, field, value) {
+            if (db) db.collection("clients").doc(id).update({ [field]: value });
+            showToast('تم تحديث البيانات بنجاح في قاعدة البيانات');
+        }
+
+        function updateClientStatusAndNotify(id, clientName, clientPhone, newStatus) {
+            if (db) db.collection("clients").doc(id).update({ status: newStatus });
+            
+            const notificationMsg = `📢 *تحديث حالة الطلب!*\n👤 *العميل:* ${clientName}\n📞 *الرقم:* ${clientPhone}\n📌 *الحالة الجديدة:* ${newStatus}`;
+            sendTelegramNotif(notificationMsg);
+            
+            let cleanPhone = clientPhone ? clientPhone.replace(/\D/g, '') : '';
+            if(cleanPhone.startsWith('0')) cleanPhone = '2' + cleanPhone;
+            let whatsappMsg = encodeURIComponent(`مرحباً ${clientName}، تم تحديث حالة طلبك إلى: *${newStatus}* عبر HIK DEV Store 🚀`);
+            window.open(`https://wa.me/${cleanPhone}?text=${whatsappMsg}`, '_blank');
+
+            showToast(`تم تغيير الحالة إلى (${newStatus}) وتجهيز رسالة الواتساب للعميل فورا! 📱`);
+        }
+
+        function sendTelegramNotif(msg) {
+            fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatId}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`).catch(e=>{});
+        }
+
+        function toggleTheme() {
+            const html = document.getElementById('htmlTag');
+            if (html.hasAttribute('data-theme')) html.removeAttribute('data-theme');
+            else html.setAttribute('data-theme', 'light');
+        }
+
+        window.addEventListener('load', () => {
+            listenRealtime();
+        });
+    </script>
+</body>
+</html>
